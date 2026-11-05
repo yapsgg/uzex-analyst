@@ -56,7 +56,9 @@ The load replaces only the `market` schema, in one transaction, so a failed run 
 
 ## Deploy
 
-Deploy to Vercel with `vercel deploy --prod`, after setting `OPENROUTER_API_KEY`, `AGENT_DATABASE_URL`, and `EVE_CHAT_PASSWORD` in the project. The backend has no public route, and only the agent reaches it.
+Deploy to Vercel with `vercel deploy --prod`, after setting `OPENROUTER_API_KEY` and `AGENT_DATABASE_URL` in the project.
+
+The app has no sign-in, so anyone with the URL can chat with the agent, open a chat from its link, and spend your OpenRouter credits. Give the OpenRouter key a spending limit. The backend has no public route, so visitors reach the data only through the agent.
 
 ## What the cleaning does
 

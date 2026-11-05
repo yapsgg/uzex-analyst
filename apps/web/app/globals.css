@@ -62,7 +62,7 @@
   --ring: oklch(0.708 0 0);
   --sidebar: oklch(0.985 0 0);
   --radius: 0.625rem;
-  --header-height: 3.5rem;
+  --header-height: 0px;
 }
 
 @media (prefers-color-scheme: dark) {

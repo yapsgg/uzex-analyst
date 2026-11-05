@@ -13,6 +13,10 @@ import { sqlResultSchema } from "../../../../agent/lib/market";
  * @returns The card, or `undefined` to fall back to the generic tool display.
  */
 export function renderToolCard(part: EveToolPart): ReactNode | undefined {
+  // Name lookups are internal steps. Showing them adds noise to the answer.
+  if (part.name === "find_product" || part.name === "find_company") {
+    return null;
+  }
   if (part.state !== "completed" || part.name !== "run_sql") {
     return undefined;
   }

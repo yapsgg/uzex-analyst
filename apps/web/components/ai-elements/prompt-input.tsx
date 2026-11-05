@@ -952,16 +952,6 @@ export const PromptInput = ({
   // Render with or without local provider
   const inner = (
     <>
-      <input
-        accept={accept}
-        aria-label="Upload files"
-        className="hidden"
-        multiple={multiple}
-        onChange={handleChange}
-        ref={inputRef}
-        title="Upload files"
-        type="file"
-      />
       <form className="w-full" onSubmit={handleSubmit} ref={formRef} {...props}>
         <InputGroup
           className={cn(

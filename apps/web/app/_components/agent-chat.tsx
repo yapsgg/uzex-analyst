@@ -1,10 +1,9 @@
 "use client";
 
-import { ClientError } from "eve/client";
 import { activeTurn, failure, interaction, turns } from "eve/events";
 import { useEveAgent, type EveMessage } from "eve/react";
 import { AlertCircleIcon, AlertTriangleIcon, BrainIcon, SquareIcon } from "lucide-react";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 
 import {
   Conversation,
@@ -26,16 +25,6 @@ import { cn } from "@/lib/utils";
 import { AgentMessage } from "./agent-message";
 import { unverifiedNumbers } from "./number-check";
 import type { AgentAnswer } from "./agent-message";
-
-const AGENT_NAME = "Exchange Analyst";
-
-/** Starting points that show the languages and kinds of question the agent handles. */
-const SUGGESTIONS = [
-  "Какой оборот биржи за 2026 год?",
-  "2026-yilda qaysi hudud aylanma bo‘yicha birinchi?",
-  "Who were the top 5 sellers by turnover in 2025?",
-  "Покажи помесячный оборот хлопка-сырца за 2025 год",
-] as const;
 
 type EveAgent = ReturnType<typeof useEveAgent>;
 
@@ -105,7 +94,6 @@ export function AgentChat({
       }
     },
   });
-  useSignInRedirect(agent.error);
 
   const view = getChatView(agent, {
     actionError,
@@ -208,87 +196,13 @@ export function AgentChat({
           "mx-auto w-full px-4 sm:px-6",
           view.showConversationLayout
             ? "from-background via-background absolute bottom-0 left-1/2 z-20 max-w-3xl -translate-x-1/2 bg-gradient-to-t to-transparent pt-4 pb-6"
-            : "flex max-w-xl flex-1 flex-col items-center justify-center gap-8 pb-16"
+            : "flex max-w-2xl flex-1 flex-col items-center justify-center"
         )}
       >
-        {view.showConversationLayout ? null : (
-          <div className="flex flex-col items-center gap-3 text-center">
-            <h1 className="text-4xl font-medium tracking-tighter sm:text-5xl">
-              {AGENT_NAME}
-            </h1>
-            <p className="text-muted-foreground max-w-md text-base text-balance">
-              Ask about 500,000 fictional exchange deals from 2022 to 2026, in
-              Russian, Uzbek, or English. Each answer shows the queries behind it,
-              so you can check where a number came from.
-            </p>
-          </div>
-        )}
         <div className="w-full">{composer}</div>
-        {view.showConversationLayout ? null : (
-          <div className="flex w-full flex-wrap justify-center gap-2">
-            {SUGGESTIONS.map((suggestion) => (
-              <button
-                className="bg-card text-muted-foreground hover:text-foreground focus-visible:ring-ring/50 rounded-full border px-3 py-1.5 text-left text-xs transition-colors focus-visible:ring-[3px] focus-visible:outline-none"
-                disabled={view.isResuming}
-                key={suggestion}
-                onClick={() => {
-                  void sendText(suggestion);
-                }}
-                type="button"
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </main>
   );
-}
-
-/**
- * Sends the visitor to `/login` when the agent rejects them and the web app
- * confirms they lack access (the access cookie expired or the password
- * changed), returning them to this chat afterwards. When the web app still
- * grants access, the chat stays put and shows the agent's error instead.
- *
- * @param error - The agent client's current error.
- */
-function useSignInRedirect(error: Error | undefined) {
-  const isUnauthenticated =
-    error instanceof ClientError && error.status === 401;
-  useEffect(() => {
-    if (!isUnauthenticated) {
-      return;
-    }
-    let isCurrent = true;
-    const redirectIfLocked = async () => {
-      if (!(await isLockedOut()) || !isCurrent) {
-        return;
-      }
-      const here = window.location.pathname + window.location.search;
-      window.location.assign(`/login?next=${encodeURIComponent(here)}`);
-    };
-    void redirectIfLocked();
-    return () => {
-      isCurrent = false;
-    };
-  }, [isUnauthenticated]);
-}
-
-/**
- * Asks the web app whether this browser still has access. The password gate
- * in `proxy.ts` answers `401` for `/api/*` requests without a valid cookie.
- *
- * @returns Whether the browser is locked out; `false` when the check fails.
- */
-async function isLockedOut(): Promise<boolean> {
-  try {
-    const response = await fetch("/api/auth/status", { cache: "no-store" });
-    return response.status === 401;
-  } catch {
-    return false;
-  }
 }
 
 /**

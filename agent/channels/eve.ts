@@ -1,29 +1,9 @@
+import { localDev, none, vercelOidc } from "eve/channels/auth";
 import { eveChannel } from "eve/channels/eve";
-import { localDev, vercelOidc, type AuthFn } from "eve/channels/auth";
-import { getPasswordSessionFromHeaders } from "../../apps/web/lib/password-auth";
 
-/**
- * Admits browser requests that carry the signed session cookie the web app sets
- * after the user enters EVE_CHAT_PASSWORD. Returns null (skip) otherwise.
- */
-const passwordAuth: AuthFn<Request> = async (request) => {
-  if (!getPasswordSessionFromHeaders(request.headers)) {
-    return null;
-  }
-
-  return {
-    attributes: { name: "eve user" },
-    authenticator: "password",
-    issuer: "eve-nextjs-fastapi",
-    principalId: "eve-user",
-    principalType: "user",
-    subject: "eve-user",
-  };
-};
-
-// Walked in order. localDev() only admits requests under `eve dev` / `vercel dev`,
-// so production traffic without a valid session cookie or OIDC token gets a 401.
+// The app is public, so none() admits anonymous visitors. vercelOidc() still identifies calls
+// from this project, such as `eve eval --url`. The limits in agent/agent.ts cap each session.
 export default eveChannel({
-  auth: [passwordAuth, vercelOidc(), localDev()],
+  auth: [vercelOidc(), localDev(), none()],
   uploadPolicy: "disabled",
 });

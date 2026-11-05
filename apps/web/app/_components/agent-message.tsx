@@ -184,7 +184,7 @@ function ToolPart({
 
   return (
     <>
-      {card ?? <GenericTool part={part} />}
+      {card === undefined ? <GenericTool part={part} /> : card}
       {part.interaction === undefined ? null : (
         <InteractionPrompt
           canRespond={canRespond}

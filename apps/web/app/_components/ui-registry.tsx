@@ -22,7 +22,6 @@ import {
   uiCatalog,
   uiSpecSchema as strictUiSpecSchema,
 } from "../../../../agent/lib/ui-catalog";
-import { getPreviewImage } from "../preview-image";
 import { DataTable } from "./data-table";
 import { MarketChart } from "./market-chart";
 
@@ -187,39 +186,6 @@ function ResultCard({
 }
 
 /**
- * Looks up a page's preview image on the server.
- *
- * @param pageUrl - The page to read, or `null` to skip the lookup.
- * @returns The preview image URL once found, otherwise `undefined`.
- */
-function usePreviewImage(pageUrl: string | null): string | undefined {
-  const [preview, setPreview] = useState<{
-    readonly image: string | null;
-    readonly pageUrl: string;
-  }>();
-
-  useEffect(() => {
-    let active = true;
-    const load = async (url: string) => {
-      const image = await getPreviewImage({ data: { url } });
-      if (active) {
-        setPreview({ image, pageUrl: url });
-      }
-    };
-    if (pageUrl !== null) {
-      void load(pageUrl);
-    }
-    return () => {
-      active = false;
-    };
-  }, [pageUrl]);
-
-  return preview?.pageUrl === pageUrl
-    ? (preview.image ?? undefined)
-    : undefined;
-}
-
-/**
  * The card's image. Falls back to the linked page's preview image when the
  * card has no image or its image fails to load, then to a placeholder.
  *
@@ -241,10 +207,7 @@ function CardImage({
   const [failed, setFailed] = useState<readonly string[]>([]);
   const ownImage = safeImageUrl(src);
   const hasOwnImage = ownImage !== null && !failed.includes(ownImage);
-  const preview = usePreviewImage(hasOwnImage ? null : pageUrl);
-  const previewUsable = preview !== undefined && !failed.includes(preview);
-  const fallback = previewUsable ? preview : undefined;
-  const image = hasOwnImage ? ownImage : fallback;
+  const image = hasOwnImage ? ownImage : undefined;
 
   if (image === undefined) {
     return (
