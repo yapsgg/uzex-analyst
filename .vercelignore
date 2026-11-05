@@ -1,0 +1,13 @@
+# Local tooling and data pipeline. None of this runs in production.
+.venv
+**/.venv
+.output
+.eve
+.env*
+!.env.example
+pipeline
+evals
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+apps/api/tests

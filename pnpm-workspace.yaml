@@ -1,0 +1,19 @@
+packages:
+  - "."
+
+minimumReleaseAgeExclude:
+  - eve
+  - ai
+  - zod
+
+allowBuilds:
+  esbuild: true
+  sharp: true
+  # Optional native compression add-ons pulled in by just-bash (local sandbox); not needed.
+  "@mongodb-js/zstd": false
+  node-liblzma: false
+
+# Security floors for transitive dependencies, from pnpm audit.
+overrides:
+  undici@7: ">=7.30.1 <8"
+  dompurify: ">=3.4.17"
